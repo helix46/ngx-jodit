@@ -6,20 +6,21 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import {Config} from 'jodit/types/config';
-import {Jodit} from "jodit";
+import { Config } from 'jodit/types/config';
+import { Jodit } from 'jodit';
 
 @Component({
   selector: 'ngx-jodit-pro',
   templateUrl: './ngx-jodit-pro.component.html',
   styleUrls: ['./ngx-jodit-pro.component.scss'],
 })
-export class NgxJoditProComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class NgxJoditProComponent
+  implements AfterViewInit, OnDestroy, OnChanges
+{
   @ViewChild('joditContainer') joditContainer!: ElementRef;
   jodit?: any;
 
@@ -30,9 +31,15 @@ export class NgxJoditProComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() options?: Partial<Config>;
 
   // value property
-  _value = '';
+  private _value: string = '';
   @Input() set value(value: string) {
     this._value = value;
+    if (this.jodit) {
+      this.jodit.value(value);
+    }
+  }
+  get value(): string {
+    return this._value;
   }
 
   @Output() valueChange = new EventEmitter<string>();
@@ -74,8 +81,8 @@ export class NgxJoditProComponent implements AfterViewInit, OnDestroy, OnChanges
       if (this.jodit) {
         this.jodit.destruct();
       }
-      this.joditContainer.nativeElement.innerHTML = this._value;
       this.jodit = Jodit.make(this.joditContainer.nativeElement, this.options);
+      this.jodit.value(this.value);
       this.jodit.events.on('change', (text: string) => {
         this.joditChange.emit(text);
         this.changeValue(text);
